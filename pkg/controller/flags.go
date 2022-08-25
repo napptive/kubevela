@@ -60,3 +60,12 @@ func AddAdmissionFlags() {
 	flag.StringVar(&auth.AuthenticationDefaultUser, "authentication-default-user", types.KubeVelaName+":"+types.VelaCoreName, "The User to impersonate when the User of application is not set.")
 	flag.StringVar(&auth.AuthenticationGroupPattern, "authentication-group-pattern", auth.DefaultAuthenticateGroupPattern, "During authentication, only groups with specified pattern will be carried on application. Resource requests will be impersonated as these selected groups.")
 }
+
+// AddComponentRenamingFlags adds the feature options for #3716 related to renaming components to enable
+// copies of an application to run in the same namespace avoiding component name collisions.
+func AddComponentRenamingFlags() {
+	// flags for component renaming
+	flag.BoolVar(&application.EnableComponentNameRandomization, "enable-component-renaming", false, "If set to true, component names will be modified adding a prefix or suffix to enable launching copies of the same application in a common namespace.")
+	flag.BoolVar(&application.ComponentNameRandomizationAddingApplicationName, "component-renaming-with-app-name", false, "If set to true, the updated component name will have the application name as it prefix.")
+	flag.BoolVar(&application.ComponentNameRandomizationAddingSuffix, "component-renaming-with-suffix", false, "If set to true, the updated component names will have a random prefix.")
+}

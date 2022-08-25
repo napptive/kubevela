@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -142,6 +143,17 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	handler, err := NewAppHandler(logCtx, r, app, appParser)
 	if err != nil {
 		return r.endWithNegativeCondition(logCtx, app, condition.ReconcileError(err), common.ApplicationStarting)
+	}
+	modifiedApp, updateApp, err := handler.RandomizeComponentNames(app)
+	if err != nil {
+		return r.endWithNegativeCondition(logCtx, app, condition.ReconcileError(err), common.ApplicationStarting)
+	}
+	if updateApp {
+		for _, c := range modifiedApp.Spec.Components {
+			klog.InfoS("new component", "name", c.Name)
+		}
+
+		return reconcile.Result{}, errors.Wrap(r.Client.Update(logCtx, modifiedApp), errAnnotatingComponentMapping)
 	}
 	endReconcile, result, err := r.handleFinalizers(logCtx, app, handler)
 	if err != nil {

@@ -196,7 +196,7 @@ func main() {
 	klog.InfoS("KubeVela information", "version", version.VelaVersion, "revision", version.GitRevision)
 	klog.InfoS("Disable capabilities", "name", disableCaps)
 	klog.InfoS("Vela-Core init", "definition namespace", oam.SystemDefinitonNamespace)
-
+	klog.InfoS("This is a message to detect changes in the core", "log-debug", logDebug, "Authentication", auth.AuthenticationWithUser)
 	restConfig := ctrl.GetConfigOrDie()
 	restConfig.UserAgent = types.KubeVelaName + "/" + version.GitRevision
 	restConfig.QPS = float32(qps)
